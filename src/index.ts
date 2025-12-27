@@ -62,6 +62,11 @@ app.patch("/patch/:id", (c) => {
   return c.json({ updated: id > 0 })
 })
 
+// Bun.serve({
+//   port:8000,
+//   fetch: app.fetch
+// })
+
 export default {
   port: 8000,
   fetch: app.fetch

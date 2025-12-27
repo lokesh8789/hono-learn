@@ -1,6 +1,6 @@
-import { Hono } from "hono";
+import { createRouter } from "../lib/create-router";
 
-const router = new Hono()
+const router = createRouter()
 
 interface LearnUser {
     id: number,

@@ -1,7 +1,7 @@
-import { Hono } from "hono";
+import { createRouter } from "../lib/create-router";
 import { AuthService } from "../services/auth.service";
 
-const router = new Hono()
+const router = createRouter()
 
 
 router.post("/login", async (c) => {

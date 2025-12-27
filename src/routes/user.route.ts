@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { UserService } from "../services/user.service";
+import { createRouter } from "../lib/create-router";
 
-const router = new Hono()
+const router = createRouter()
 
 router.post("/create", async (c) => {
     const body = await c.req.json();
@@ -20,6 +21,7 @@ router.get("/getAll", async (c) => {
 router.get("/getByEmail/:email", async (c) => {
     const email = c.req.param("email");
     try {
+        console.log("logged in user: ", c.var.user)
         const user = await UserService.getByEmail(email);
         return c.json({ success: true, user }, 200);
     } catch (err: any) {

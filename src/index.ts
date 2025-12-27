@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import { learnRouter } from './routes/learn.route'
+import { userRouter } from './routes/user.route'
 
 const app = new Hono().basePath("/hono-service")
 
@@ -11,6 +12,7 @@ app.get('/', (c) => {
 })
 
 app.route("/api/v1/learn", learnRouter)
+app.route("/api/v1/users", userRouter)
 
 // Bun.serve({
 //   port:8000,

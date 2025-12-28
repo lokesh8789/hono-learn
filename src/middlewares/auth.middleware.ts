@@ -1,6 +1,7 @@
 import { Context, Next } from "hono"
 import { JwtUtil } from "../utils/jwt.util";
 import { UserRepository } from "../repository/user.repository";
+import { RuntimeException, UnauthorizedException } from "../exceptions/exception";
 
 const PUBLIC_ROUTES = ['/api/v1/auth/login', '/api/v1/users/create', '/api/v1/health', '/api/v1/learn']
 
@@ -24,12 +25,12 @@ export const authMiddleware = async (c: Context, next: Next) => {
         const payload = await JwtUtil.verifyToken(token);
         const user = await UserRepository.getUserByEmail(payload.sub as string);
         if (!user) {
-            return c.json({ error: 'User no longer exists' }, 401);
+            throw new UnauthorizedException("User no longer exists")
         }
         c.set('user', user);
         c.set('jwtPayload', payload);
         await next();
     } catch (err: any) {
-        return c.json({ error: 'Invalid or expired token' }, 401);
+        throw new UnauthorizedException("Invalid or expired token")
     }
 }

@@ -1,3 +1,4 @@
+import { ResourceNotFoundException, RuntimeException } from "../exceptions/exception";
 import { UserRepository } from "../repository/user.repository"
 import { HashUtil } from "../utils/hashing.util";
 
@@ -6,7 +7,7 @@ export const UserService = {
         console.log("Recevied User", data)
         const existing = await UserRepository.getUserByEmail(data.email);
         if (existing) {
-            throw new Error("Email already in use");
+            throw new RuntimeException(409, "Email already in use");
         }
 
         const hashedPassword = await HashUtil.hash(data.password);
@@ -33,13 +34,13 @@ export const UserService = {
 
     async getByEmail(email: string): Promise<UserResponseSchema> {
         const user = await UserRepository.getUserByEmail(email);
-        if (!user) throw new Error("User not found");
+        if (!user) throw new ResourceNotFoundException("User not found");
         return { id: user.id, name: user.name, email: user.email };
     },
 
     async removeUser(id: number): Promise<boolean> {
         const ok = await UserRepository.deleteUser(id);
-        if (!ok) throw new Error("User not found");
+        if (!ok) throw new ResourceNotFoundException("User not found");
         return true;
     },
 }

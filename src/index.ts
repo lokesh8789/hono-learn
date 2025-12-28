@@ -4,11 +4,17 @@ import { learnRouter } from './routes/learn.route'
 import { userRouter } from './routes/user.route'
 import { authRouter } from './routes/auth.route'
 import { authMiddleware } from './middlewares/auth.middleware'
+import { cors } from 'hono/cors'
 
 const app = new Hono().basePath("/hono-service")
 
+app.use(cors({
+  origin: "*",
+  allowHeaders: ["*"],
+  allowMethods: ["*"],
+}))
 app.use(logger())
-app.use("*", authMiddleware)
+app.use(authMiddleware)
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')

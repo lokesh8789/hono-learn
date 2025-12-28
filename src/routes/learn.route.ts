@@ -1,5 +1,7 @@
-import { createRouter } from "../lib/create-router";
+import { createRouter, Env } from "../lib/create-router";
 import { streamSSE } from 'hono/streaming';
+import { upgradeWebSocket } from 'hono/bun';
+import { Context } from "hono";
 
 const router = createRouter()
 
@@ -64,5 +66,56 @@ router.get("/sse", (c) => {
         }
     })
 })
+
+router.get("/ws", upgradeWebSocket((c: Context<Env>) => {
+    return {
+        onOpen(evt, ws) {
+            console.log("WebSocket Connection Opened")
+            console.log(evt)
+            ws.send("Hi Buddy")
+        },
+        onClose(evt, ws) {
+            console.log("WebSocket Connection Closed")
+            console.log(evt)
+        },
+        onError(evt, ws) {
+            console.log("Websocket Error Received")
+            console.log(evt)
+        },
+        onMessage(evt, ws) {
+            console.log("WebSocket Message Recevied")
+            console.log(evt)
+            ws.send(`Received: ${evt.data.toString()}`)
+        },
+    }
+}))
+
+let ws: WebSocket | null = null;
+
+router.get("/ws-client", (c) => {
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        console.log("Using existing connection");
+        ws.send("Triggered from route");
+        return c.text("Existing connection used.");
+    }
+
+    ws = new WebSocket("ws://localhost:8000/hono-service/api/v1/learn/ws");
+
+    ws.onopen = () => {
+        console.log("New Connection Opened");
+        ws?.send("I am Client");
+    };
+
+    ws.onmessage = (ev) => {
+        console.log("Received:", ev.data);
+    };
+
+    ws.onclose = () => {
+        console.log("Connection Closed");
+        ws = null;
+    };
+
+    return c.text("New connection initiated.");
+});
 
 export { router as learnRouter }

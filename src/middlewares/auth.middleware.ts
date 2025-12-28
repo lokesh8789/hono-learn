@@ -7,7 +7,7 @@ const PUBLIC_ROUTES = ['/api/v1/auth/login', '/api/v1/users/create', '/api/v1/he
 export const authMiddleware = async (c: Context, next: Next) => {
     const path = c.req.path
 
-    const checkPath = path.replace('/hono-service/api/v1', '');
+    const checkPath = path.replace('/hono-service', '');
     if (PUBLIC_ROUTES.some(route => checkPath.startsWith(route))) {
         console.log("Got Public Path", path)
         return await next();

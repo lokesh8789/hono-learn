@@ -1,4 +1,5 @@
 import { createRouter } from "../lib/create-router";
+import { streamSSE } from 'hono/streaming';
 
 const router = createRouter()
 
@@ -53,6 +54,15 @@ router.put("/put/:id", (c) => {
 router.patch("/patch/:id", (c) => {
     const id = Number(c.req.param('id'))
     return c.json({ updated: id > 0 })
+})
+
+router.get("/sse", (c) => {
+    return streamSSE(c, async (stream) => {
+        for (let i = 0; i < 10; i++) {
+            await stream.writeSSE({ data: "Lokesh", id: i.toString() })
+            await stream.sleep(1000)
+        }
+    })
 })
 
 export { router as learnRouter }
